@@ -10,6 +10,7 @@ pages = {
     "Features": [
         st.Page("user_input.py", title="Triage Assistant"),
         st.Page("chatbot.py", title="Education Assistant"),
+        st.Page("test.py", title="test"),
 
     ],
 

@@ -157,13 +157,14 @@ with st.form("symptom_form"):
     st.write("**To start using this triage assistant, you can input either your symptoms (or medical situation) AND/or upload a photo of your symptoms / situation.**")
 
     user_input = st.text_area(label="Describe your symptoms or situation:", placeholder="Type your symptoms or situation..." )
+    uploaded_image = st.file_uploader("Upload an image of your symptoms or situation", type=["png","jpg","jpeg"])
 
-    uploaded_image_url = st.text_input("Enter a URL that points to a PNG/JPG/JPEG image", placeholder="Example: https://www.example.com") 
+
     submitted = st.form_submit_button("Submit")
 
 
 if submitted:
-    if not user_input and not uploaded_image_url:
+    if not user_input and not uploaded_image:
         st.error("Please either input some symptoms or upload a file of your symptoms before submitting.")
     else:
         with st.spinner("Analyzing symptoms..."):
@@ -171,10 +172,15 @@ if submitted:
              # --- Extract text from image if uploaded ---
              
             image_text = "" 
-            if uploaded_image_url:
+            if uploaded_image:
 
                 prompt = "Describe any visible medical symptoms from the picture. If there are no medical symptoms, return a generic response that says that there are no symptoms detected"
                 openai.api_key = st.secrets["OPENAI_API_KEY"]
+                
+                image_bytes = uploaded_image.read()
+                base64_data = base64.b64encode(image_bytes).decode("utf-8")
+                mime_type = uploaded_image.type 
+                data_url = f"data:{mime_type};base64,{base64_data}"
 
                 # send image and prompt in a single user message
                 response = openai.chat.completions.create(
@@ -184,7 +190,7 @@ if submitted:
                         "role": "user",
                         "content": [
                             {"type": "text", "text": prompt},
-                            {"type": "image_url", "image_url": {"url": uploaded_image_url}}
+                            {"type": "image_url", "image_url": {"url": data_url}}
                         ]
                     }
                 ]   
@@ -209,7 +215,7 @@ if submitted:
                     st.write("**Medical symptoms from image:**")
                     st.write(image_text_summary)
                     st.write('For reference, this is your uploaded image:')
-                    image = Image.open(uploaded_file)
+                    image = Image.open(uploaded_image)
 
                     st.image(image, caption="Uploaded Image", use_container_width=True)
 
@@ -232,7 +238,7 @@ if submitted:
                     st.write("**Medical symptoms from image:**")
                     st.write(image_text_summary)
                     st.write('For reference, this is your uploaded image:')
-                    image = Image.open(uploaded_file)
+                    image = Image.open(uploaded_image)
 
                     st.image(image, caption="Uploaded Image", use_container_width=True)
 
@@ -270,7 +276,7 @@ if submitted:
                     st.write("**Medical symptoms from image:**")
                     st.write(image_text_summary)
                     st.write('For reference, this is your uploaded image:')
-                    image = Image.open(uploaded_file)
+                    image = Image.open(uploaded_image)
                     st.image(image, caption="Uploaded Image", use_container_width=True)
 
                     st.divider()
