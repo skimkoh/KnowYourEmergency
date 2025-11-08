@@ -1,0 +1,16 @@
+# Ignore virtual environments
+.venv/
+venv/
+env/
+llm/
+__pycache__/
+*.pyc
+.uv/
+.DS_Store 
+
+# Ignore environment files
+.env
+.env.*
+
+# Ignore Streamlit secrets
+.streamlit
