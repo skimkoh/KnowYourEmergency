@@ -52,11 +52,29 @@ st.divider()
 
 st.subheader("Key Features")
 
-st.write("**Triage Assistant")
+st.write("**Triage Assistant**")
 st.text("User input their medical symptoms with either/both a free-text area and a picture uploader.")
 st.text("The assistant will first summarize the symptoms to the users, then give advice as to whether their symptoms are considered as non-emergency / emergency and give next steps.")
 
-st.
+st.subheader("Example with an image")
+st.image("about_us_pictures/summary.png", caption="Assistant will summarized the symptoms from the uploaded image as shown")
+st.image("about_us_pictures/response.png", caption="Assistant will show advice based on guidelines")
+
+st.subheader("The assistant is smart enough to check the similarities between image and text before summarizing both. See the example as below:")
+
+st.text("User can input different, contradicting symptoms for the text field and image:")
+st.image("about_us_pictures/contradicting.png", caption="Contradicting symptoms")
+
+st.text("Assistant will confirm and summarize the symptoms separately for the text field and image:")
+st.image("about_us_pictures/contradict_summary.png", caption="Summarized symptoms")
+
+st.text("Not to worry! The assistant is smart enough to reject the request due to contradicting symptoms:")
+
+st.image("about_us_pictures/contradict_response.png", caption="Clarifications required")
+
+st.text("The assistant is also flexible enough to detect zero medical symptoms in both free-text field and images as well.")
+
+
 
 
 

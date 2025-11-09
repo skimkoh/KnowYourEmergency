@@ -21,6 +21,7 @@ from langchain.chains import RetrievalQAWithSourcesChain
 from PIL import Image 
 from sentence_transformers import SentenceTransformer, util 
 
+
 # --------- Function to fetch text from URL ---------
 def fetch_url_text(url):
     try:
@@ -150,13 +151,14 @@ triage_chain = RetrievalQAWithSourcesChain.from_chain_type(
 
 st.title("🚑 :red[Emergency Triage Assistant]")
 
+
 with st.form("symptom_form"):
     st.write("**Unsure whether your medical symptoms are considered as emergencies or non-emergencies? Use this form to help you make better decisions!**")
     st.write("**To start using this triage assistant, you can input either your symptoms (or medical situation) AND/or upload a photo of your symptoms / situation.**")
 
-    user_input = st.text_area(label="Describe your symptoms or situation:", placeholder="Type your symptoms or situation..." )
+    user_input = st.text_area(label="Describe your symptoms or situation:", placeholder="Type your symptoms or situation...")
+    st.write("**OR/AND**")
     uploaded_image = st.file_uploader("Upload an image of your symptoms or situation", type=["png","jpg","jpeg"], accept_multiple_files=False)
-
 
     submitted = st.form_submit_button("Submit")
 
