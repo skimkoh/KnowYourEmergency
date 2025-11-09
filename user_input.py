@@ -1,9 +1,7 @@
 import streamlit as st
 import requests
 import os
-import tempfile
 import base64
-import httpx
 import openai
 import json
 
@@ -20,9 +18,8 @@ from langchain.chains import LLMChain
 from langchain_core.documents import Document
 from langchain.chains import RetrievalQA
 from langchain.chains import RetrievalQAWithSourcesChain
-from PIL import Image # Required for working with image data
-from sentence_transformers import SentenceTransformer, util  # For text similarity
-from langchain_core.messages import HumanMessage
+from PIL import Image 
+from sentence_transformers import SentenceTransformer, util 
 
 # --------- Function to fetch text from URL ---------
 def fetch_url_text(url):
