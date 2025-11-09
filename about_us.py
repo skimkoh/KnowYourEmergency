@@ -52,6 +52,13 @@ st.divider()
 
 st.subheader("Key Features")
 
+st.write("**Triage Assistant")
+st.text("User input their medical symptoms with either/both a free-text area and a picture uploader.")
+st.text("The assistant will first summarize the symptoms to the users, then give advice as to whether their symptoms are considered as non-emergency / emergency and give next steps.")
+
+st.
+
+
 
 
 

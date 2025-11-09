@@ -5,6 +5,7 @@ import tempfile
 import base64
 import httpx
 import openai
+import json
 
 from bs4 import BeautifulSoup
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -157,7 +158,7 @@ with st.form("symptom_form"):
     st.write("**To start using this triage assistant, you can input either your symptoms (or medical situation) AND/or upload a photo of your symptoms / situation.**")
 
     user_input = st.text_area(label="Describe your symptoms or situation:", placeholder="Type your symptoms or situation..." )
-    uploaded_image = st.file_uploader("Upload an image of your symptoms or situation", type=["png","jpg","jpeg"])
+    uploaded_image = st.file_uploader("Upload an image of your symptoms or situation", type=["png","jpg","jpeg"], accept_multiple_files=False)
 
 
     submitted = st.form_submit_button("Submit")
@@ -224,7 +225,6 @@ if submitted:
                     user_input_summary = confirmation_chain.run(situation=user_input)
                     st.write(user_input_summary)
 
-
                     st.divider()
                     st.subheader("Triage Assistant Advice:", divider="red")
                     st.text("Traige assisant is unable to give proper advice as the medical symptoms from the free-text field and the uploaded image seem to contradict each other. Please clarify or re-upload another image.")
@@ -252,7 +252,9 @@ if submitted:
                     st.subheader("Triage Assistant Advice:", divider="blue")
                     combined_input = user_input + " " + image_text
                     result = triage_chain.invoke({"question": combined_input})
-                    st.json(result["answer"])
+                    parsed_results = json.loads(result['answer'])
+                    st.write(f"This is a **{parsed_results['category']}**.")
+                    st.write(f"{parsed_results['advice']}")
 
             else:
                 # Only text or only image
@@ -269,7 +271,9 @@ if submitted:
                     st.subheader("Triage Assistant Advice:", divider="blue")
                     combined_input = user_input + " " + image_text
                     result = triage_chain.invoke({"question": combined_input})
-                    st.json(result["answer"])
+                    parsed_results = json.loads(result['answer'])
+                    st.write(f"This is a **{parsed_results['category']}**.")
+                    st.write(f"{parsed_results['advice']}")
 
                 if image_text:
                     image_text_summary = confirmation_chain.run(situation=image_text)
@@ -283,5 +287,8 @@ if submitted:
                     st.subheader("Triage Assistant Advice:", divider="blue")
                     combined_input = user_input + " " + image_text
                     result = triage_chain.invoke({"question": combined_input})
-                    st.json(result["answer"])
+                    parsed_results = json.loads(result['answer'])
+                    st.write(f"This is a **{parsed_results['category']}**.")
+                    st.write(f"{parsed_results['advice']}")
 
+                   
