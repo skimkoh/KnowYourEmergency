@@ -9,8 +9,8 @@ if not check_password():
 pages = {
     "Features": [
         st.Page("user_input.py", title="Triage Assistant"),
-        st.Page("chatbot.py", title="Education Assistant"),
-
+        st.Page("quiz.py", title="Education Assistant"),
+        st.Page("sample_pics.py", title="Sample Pictures for Triage Assistant"),
     ],
 
      "Documentation": [

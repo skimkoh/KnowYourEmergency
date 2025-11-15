@@ -149,7 +149,7 @@ triage_chain = RetrievalQAWithSourcesChain.from_chain_type(
 
 
 
-st.title("🚑 :red[Emergency Triage Assistant]")
+st.title(":red[Emergency Triage Assistant]")
 
 
 with st.form("symptom_form"):
