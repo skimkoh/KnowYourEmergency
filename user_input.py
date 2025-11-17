@@ -5,7 +5,6 @@ import base64
 import openai
 import json
 
-from bs4 import BeautifulSoup
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import Chroma
@@ -18,76 +17,20 @@ from langchain.chains import LLMChain
 from langchain_core.documents import Document
 from langchain.chains import RetrievalQA
 from langchain.chains import RetrievalQAWithSourcesChain
-from PIL import Image 
+from PIL import Image
+from populate_chroma import populate_chroma_db
 from sentence_transformers import SentenceTransformer, util 
 
 
-# --------- Function to fetch text from URL ---------
-def fetch_url_text(url):
-    try:
-        response = requests.get(url)
-        soup = BeautifulSoup(response.text, "html.parser")
-        # Get visible text
-        text = " ".join([p.get_text() for p in soup.find_all("p")])
-        return text
-    except Exception as e:
-        st.error(f"Error fetching URL: {e}")
-        return ""
-
-url_1 = "https://www.channelnewsasia.com/cna-insider/scdf-emergency-ambulance-services-995-calls-life-death-hospital-4180921"  
-url_2 = "https://www.scdf.gov.sg/home/about-scdf/emergency-medical-services#:~:text=The%20SCDF%20responded%20to%20256%2C837,bleeding%2C%20major%20traumas%20and%20stroke"
-
-article_1 = fetch_url_text(url_1)
-article_2 = fetch_url_text(url_2)
-
-if not article_1 or not article_2:
-    st.error("Could not fetch one or both articles. Please check URLs.")
-    st.stop()
-
-llm = ChatOpenAI(openai_api_key=st.secrets["OPENAI_API_KEY"], model="gpt-4o-mini", temperature=0)
+populate_chroma_db(st.secrets["OPENAI_API_KEY"], persist_dir="chroma_db")
 embeddings = OpenAIEmbeddings(openai_api_key=st.secrets["OPENAI_API_KEY"])
-
-
-summary_prompt = PromptTemplate.from_template("""
-Extract key facts, entities, and context from the following articles.
-Return bullet points covering symptoms of a hospital emergency and symptoms of a non emergency, and what should be done for either an emergency or a non-emergency (example: hotline, where to go)
-
-Article:
-{article}
-""")
-
-
-summary_chain = LLMChain(llm=llm, prompt=summary_prompt)
-
-summary_1 = summary_chain.run(article=article_1)
-summary_2 = summary_chain.run(article=article_2)
-
-docs = [
-    Document(page_content=summary_1, metadata={"source": "article_1"}),
-    Document(page_content=summary_2, metadata={"source": "article_2"})
-]
-
-splitter = RecursiveCharacterTextSplitter(chunk_size=800, chunk_overlap=100)
-chunks = splitter.split_documents(docs)
-
-if not os.path.exists("chroma_db") or not os.listdir("chroma_db"):
-    vectorstore = Chroma(
+vectorstore = Chroma(
         persist_directory="chroma_db",
         collection_name="triage_guide",
         embedding_function=embeddings
-    )
-    vectorstore.add_documents(chunks)
-    vectorstore.persist()
-  
-else:
-    vectorstore = Chroma(
-        persist_directory="chroma_db",
-        collection_name="triage_guide",
-        embedding_function=embeddings
-        
-    )
+        )
+    
  
-
 retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
 
  # --- confirmation prompt ---
@@ -109,7 +52,7 @@ Context:
 {situation}
 
 """)
-
+llm = ChatOpenAI(openai_api_key=st.secrets["OPENAI_API_KEY"], model="gpt-4o-mini", temperature=0)
 confirmation_chain = LLMChain(llm=llm, prompt=confirmation_prompt)
 
  # --- triage prompt ---

@@ -23,7 +23,8 @@ st.markdown(
         - Provide concise and empathetic advice written in plain language
     
     - **Educational Engagement**
-        - 'Education Assistant' where users can learn to differentiate emergency vs non-emergency symptoms through a MCQ quiz
+        - 'Education Assistant' where users can learn to differentiate emergency vs non-emergency symptoms through a short quiz with generated questions
+        - The objective is to show that LLM is a good tool to educate citizens, especially in the area of training and creating educational materials
     """
 )
 
@@ -43,7 +44,7 @@ data_source_table = {
     ],
     "Description": ["Official emergency medical guidelines", "Real-world context of ambulance usage and public awareness", "Summarized emergency/non-emergency scenarios (generated from LLM processing of articles)"],
     "Purpose": ["Distinguish between emergency and non-emergency cases", "Provide example cases and best practices", "Used for vector retrieval and reasoning"],
-    "URLs (if any)": [1247, 892, 654],
+    "URLs (if any)": ["https://www.scdf.gov.sg/home/about-scdf/emergency-medical-services#:~:text=The%20SCDF%20responded%20to%20256%2C837,bleeding%2C%20major%20traumas%20and%20stroke", "https://www.channelnewsasia.com/cna-insider/scdf-emergency-ambulance-services-995-calls-life-death-hospital-4180921", 'NIL'],
 }
 
 st.table(data_source_table, border="horizontal")
@@ -52,31 +53,36 @@ st.divider()
 
 st.subheader("Key Features")
 
-st.write("**Triage Assistant**")
-st.text("User input their medical symptoms with either/both a free-text area and a picture uploader.")
-st.text("The assistant will first summarize the symptoms to the users, then give advice as to whether their symptoms are considered as non-emergency / emergency and give next steps.")
+st.write("In this app, there are two features: (i) Triage Assistant (ii) Education Assistant")
+
+st.subheader("**Triage Assistant**")
+st.text("User input their medical symptoms with either/both a free-text area and a picture uploader. The assistant will first summarize the symptoms to the users, then give advice as to whether their symptoms are considered as non-emergency / emergency and give next steps.")
 
 st.subheader("Example with an image")
-st.image("about_us_pictures/summary.png", caption="Assistant will summarized the symptoms from the uploaded image as shown")
-st.image("about_us_pictures/response.png", caption="Assistant will show advice based on guidelines")
+st.image("about_us_pictures/summary.png", caption="Assistant will summarized the symptoms from the uploaded image as shown", width=800)
+st.image("about_us_pictures/response.png", caption="Assistant will show advice based on guidelines", width=800)
 
 st.subheader("The assistant is smart enough to check the similarities between image and text before summarizing both. See the example as below:")
 
 st.text("User can input different, contradicting symptoms for the text field and image:")
-st.image("about_us_pictures/contradicting.png", caption="Contradicting symptoms")
+st.image("about_us_pictures/contradicting.png", caption="Contradicting symptoms", width=800)
 
 st.text("Assistant will confirm and summarize the symptoms separately for the text field and image:")
-st.image("about_us_pictures/contradict_summary.png", caption="Summarized symptoms")
+st.image("about_us_pictures/contradict_summary.png", caption="Summarized symptoms", width=800)
 
 st.text("Not to worry! The assistant is smart enough to reject the request due to contradicting symptoms:")
 
-st.image("about_us_pictures/contradict_response.png", caption="Clarifications required")
+st.image("about_us_pictures/contradict_response.png", caption="Clarifications required", width=800)
 
 st.text("The assistant is also flexible enough to detect zero medical symptoms in both free-text field and images as well.")
 
+st.divider()
 
+st.subheader("**Education Assistant**")
+st.text("The assistant dynamically generates quiz questions based on the guidelines provided.")
+st.text("User will need to input either NON-EMERGENCY or EMERGENCY based on what they have learnt, of which the correct answer and explanation will be displayed to the user after")
 
+st.image("about_us_pictures/quiz_item.png", caption="Example of a quiz item", width=800)
 
-
-
-
+st.text("After the quiz is completed, users have the ability to generate the same quiz items again, or to generate a different set of quiz items to test their knowledge again.")
+st.image("about_us_pictures/after_quiz.png", caption="End of the quiz", width=800)

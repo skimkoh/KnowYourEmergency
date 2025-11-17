@@ -10,11 +10,21 @@ from langchain_openai import ChatOpenAI
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 from langchain_core.documents import Document
+from populate_chroma import populate_chroma_db
 
-st.text('Education Assistant')
+def populate_quiz_items():
+    llm = ChatOpenAI(openai_api_key=st.secrets["OPENAI_API_KEY"], model="gpt-4o-mini", temperature=0)
+
+    prompt = edu_prompt.format(context=context)
+
+    quiz = llm.invoke(prompt)
+
+    st.session_state.quiz_items = json.loads(quiz.content)
+
 
 if "vectorstore_loaded" not in st.session_state:
-    embeddings = ChatOpenAI(model="gpt-4o-mini", temperature=0.7)
+    populate_chroma_db(st.secrets["OPENAI_API_KEY"], persist_dir="chroma_db")
+    embeddings = OpenAIEmbeddings(openai_api_key=st.secrets["OPENAI_API_KEY"])
     st.session_state.vectorstore = Chroma(
         persist_directory="chroma_db",
         collection_name="triage_guide",
@@ -35,8 +45,12 @@ Please also have some new questions (that did not reference the guidelines) base
 Each question should have:
 - a short symptom scenario (1–2 sentences)
 - the correct answer ("EMERGENCY" or "NON-EMERGENCY")
-- a one to two sentence explanation. If it is a non emergency, also provide some medical advice.
-- ensure questions are not repeated twice
+- a one to two sentence explanation. If it is a non emergency, also provide some medical advice. For example if its an ankle injury, there is a RICE method as a form of treatment.
+
+Also ensure:
+- Questions are not repeated
+- Try to have some questions that are harder
+- Avoid making the answer for the questions alternate. (For example, question 1 is emergency, question 2 is non-emergency, question 3 is emergency.)
 
 Return ONLY valid JSON, without markdown or extra text like the example below:
 [
@@ -53,14 +67,7 @@ Guidelines:
 """)
 
 if "quiz_items" not in st.session_state:
-
-    llm = ChatOpenAI(openai_api_key=st.secrets["OPENAI_API_KEY"], model="gpt-4o-mini", temperature=0)
-
-    prompt = edu_prompt.format(context=context)
-
-    quiz = llm.invoke(prompt)
-
-    st.session_state.quiz_items = json.loads(quiz.content)
+    populate_quiz_items()
 
 
 quiz_items = st.session_state.quiz_items
@@ -74,13 +81,28 @@ if "score" not in st.session_state:
 if "finished" not in st.session_state:
     st.session_state.finished = False
 
+
 def restart_quiz():
+    
     st.session_state.questions = quiz_items[:]  # exact original order
     
     st.session_state.index = 0
     st.session_state.score = 0
     st.session_state.finished = False
     st.session_state.answered = False
+
+
+def refresh_quiz():
+    populate_quiz_items()
+    quiz_items = st.session_state.quiz_items
+
+    st.session_state.questions = quiz_items[:]  # exact original order
+    
+    st.session_state.index = 0
+    st.session_state.score = 0
+    st.session_state.finished = False
+    st.session_state.answered = False
+
 
 
 st.title("Emergency or Not Quiz?")
@@ -95,10 +117,13 @@ if st.session_state.finished:
     st.subheader("Quiz Completed!")
     st.write(f"Your Score: **{st.session_state.score} / {len(st.session_state.questions)}**")
 
-    if st.button("Restart Quiz"):
+    if st.button("Restart Same Quiz (This will return the same questions)"):
         restart_quiz()
         st.rerun()
 
+    if st.button("Refresh Quiz (This option will try to generate different questions)"):
+        refresh_quiz()
+        st.rerun()
 
 if st.session_state.index >= len(st.session_state.questions):
     st.error("Question index out of range. Restarting quiz...")
